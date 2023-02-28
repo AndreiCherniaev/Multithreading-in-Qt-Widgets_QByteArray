@@ -12,11 +12,11 @@ Worker::Worker(){
 }
 
 void Worker::updateUSBDataCallback(){
-    QByteArray buf("I like slow USB HID" );
+    QByteArray buf("I like slow USB HID");
     emit GuiUpdatePlease(buf);
     //Этот код окажет влияние при типе соединения QueuedConnection между GuiUpdatePlease и GuiUpdateCallback
     //вызывая грязное чтения
-    for(int i =0;i<64;i++){
+    for(int i =0;i<buf.size();i++){
         buf[i]=i+'0';
         if (i+'0' > 250) i=0;
     }
@@ -29,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     thread = new QThread;
     Worker *worker = new Worker;
-    worker->moveToThread(thread);
+    worker->moveToThread(thread); //The object cannot be moved if it has a parent.
     //Попробуйте вариант соединения Qt::QueuedConnection
     connect(worker, &Worker::GuiUpdatePlease, this, &MainWindow::GuiUpdateCallback, Qt::BlockingQueuedConnection);
     thread->start();
